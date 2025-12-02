@@ -1,1 +1,4 @@
 project_id = "walpaeffdqlxrpfcrvcm"
+
+[functions.predict-grade]
+verify_jwt = false
