@@ -14,7 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      model_metrics: {
+        Row: {
+          accuracy_score: number
+          created_at: string | null
+          id: string
+          mean_absolute_error: number
+          model_name: string
+          r_squared: number
+          training_samples: number
+        }
+        Insert: {
+          accuracy_score: number
+          created_at?: string | null
+          id?: string
+          mean_absolute_error: number
+          model_name?: string
+          r_squared: number
+          training_samples: number
+        }
+        Update: {
+          accuracy_score?: number
+          created_at?: string | null
+          id?: string
+          mean_absolute_error?: number
+          model_name?: string
+          r_squared?: number
+          training_samples?: number
+        }
+        Relationships: []
+      }
+      training_data: {
+        Row: {
+          created_at: string | null
+          grade_achieved: number
+          hours_studied: number
+          id: string
+        }
+        Insert: {
+          created_at?: string | null
+          grade_achieved: number
+          hours_studied: number
+          id?: string
+        }
+        Update: {
+          created_at?: string | null
+          grade_achieved?: number
+          hours_studied?: number
+          id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
