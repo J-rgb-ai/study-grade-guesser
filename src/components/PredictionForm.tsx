@@ -4,10 +4,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PredictionResult {
   predictedGrade: number;
   confidence: number;
+  reasoning?: string;
 }
 
 const PredictionForm = () => {
@@ -28,26 +30,27 @@ const PredictionForm = () => {
 
     setIsLoading(true);
     try {
-      // TODO: Replace with actual backend call once Lovable Cloud is enabled
-      // Temporary simulation for demo
-      const studyHours = parseFloat(hours);
-      const baseGrade = 45 + (studyHours * 5.5);
-      const predictedGrade = Math.min(100, Math.max(0, baseGrade + (Math.random() - 0.5) * 5));
-      const confidence = Math.min(95, 70 + (studyHours * 2));
-      
+      const { data, error } = await supabase.functions.invoke('predict-grade', {
+        body: { hours: parseFloat(hours) }
+      });
+
+      if (error) throw error;
+
       setPrediction({
-        predictedGrade: Math.round(predictedGrade * 10) / 10,
-        confidence: Math.round(confidence),
+        predictedGrade: Math.round(data.predictedGrade * 10) / 10,
+        confidence: Math.round(data.confidence),
+        reasoning: data.reasoning,
       });
       
       toast({
-        title: "Prediction Complete",
-        description: `Based on ${hours} hours of study`,
+        title: "AI Prediction Complete",
+        description: `Analysis based on ${hours} hours of study`,
       });
     } catch (error) {
+      console.error("Prediction error:", error);
       toast({
         title: "Prediction Failed",
-        description: "Unable to generate prediction. Please try again.",
+        description: "Unable to generate AI prediction. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -142,9 +145,17 @@ const PredictionForm = () => {
               </div>
             </div>
 
+            {prediction.reasoning && (
+              <div className="bg-accent/10 border border-accent/20 rounded-lg p-4">
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-semibold text-foreground">AI Analysis:</span>{" "}
+                  {prediction.reasoning}
+                </p>
+              </div>
+            )}
+
             <p className="text-sm text-center text-muted-foreground italic">
-              This prediction is based on a linear regression model trained on
-              historical student data
+              This prediction is powered by AI machine learning analysis
             </p>
           </div>
         )}
